@@ -5,6 +5,7 @@ from mypub import MyPub
 from std_msgs.msg import *
 
 if __name__ == '__main__':
+    # Sample usage
     nc = NodeControl()
     nc.addnode(MyPub(name='a',
                      pub_data_type=String,

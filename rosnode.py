@@ -6,6 +6,7 @@ from rclpy import create_node           # Only need to create a node
 
 
 class RosNode(object):
+    """ Simplifies creating ROS nodes """
     def __init__(self,
                  name='node',
                  sub_data_type=None,
@@ -76,6 +77,7 @@ class RosNode(object):
                   .format(type(e).__name__))
 
     def subscribe(self, msg):
+        """ Posts msg to get_logger().info """
         self.node.get_logger().info('"%s"' % msg.data)
 
     def __sub_pub(self, msg):
@@ -86,6 +88,7 @@ class RosNode(object):
         self.sub_pub()
 
     def sub_pub():
+        """ Handles nodes that both publish and subscribe. """
         print('TODO')
 
     def __publish(self):
@@ -97,9 +100,13 @@ class RosNode(object):
             self.publish()
         except BaseException as e:
             # Lets just catch them all and display the issue.
-            print('Failed to publish due to a {}!'.format(type(e).__name__))
+            print('Failed to publish due to a\
+                  {} exception!'.format(type(e).__name__))
 
     def publish(self):
+        """ Publishes what is currently in pub_msg.data. If pub_msg.data is
+            iteritable it will instead call next on it.
+        """
         if (not isinstance(self.pub_data, Iterable))\
                 or self.pub_data_type is String:
                     self.publisher.publish(self.pub_msg)
@@ -113,6 +120,11 @@ class RosNode(object):
             self.publisher.publish(self.pub_msg)
 
     def cleanup(self):
+        """ Destroys the node and lets the user know it was destroyed. """
         name = self.node.get_name()
-        self.node.destroy_node()
-        print('Destroyed node: ', name)
+        try:
+            self.node.destroy_node()
+            print('Destroyed node: ', name)
+        except BaseException as e:
+            print('Failed to destroy node due to a\
+                  {} exception!'.format(type(e).__name__))

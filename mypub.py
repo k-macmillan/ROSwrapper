@@ -6,6 +6,9 @@ from std_msgs.msg import *
 
 
 class MyPub(RosNode):
+    """ This is an example of what a class would look like if you wanted to
+        override RosNode so you can have custom publish/subscribe functions.
+    """
     def __init__(self,
                  name='node',
                  sub_data_type=None,
@@ -25,9 +28,9 @@ class MyPub(RosNode):
                                     pub_func,
                                     pub_rate,
                                     pub_data)
-        print('Sent to super')
 
     def publish(self):
+        """ Example overriden publish method """
         if (not isinstance(self.pub_data, Iterable))\
                 or self.pub_data_type is String:
                     self.pub_msg.data =\
@@ -44,4 +47,5 @@ class MyPub(RosNode):
         print('Overriden to: ', self.pub_msg.data)
 
     def subscribe(self, msg):
+        """ Example overriden subscribe method """
         print('We got a message: ', msg.data)
