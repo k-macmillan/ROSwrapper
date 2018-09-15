@@ -36,7 +36,7 @@ nc.addnode(RosNode(name='publisher',
                    pub_data='Hello World'))
 nc.run
 ```
-You can spin up a publisher in 3 lines of code using ROSwrapper. Additional publishers/subscribers are 1 line of code each.
+You can spin up a publisher in 3 lines of code using ROSwrapper. Additional publishers/subscribers are 1 line of code each. Nodes are added to the [NodeControl](nodecontrol.py) so everything can be cleanly executed and cleaned up.
 
 ## A RosNode
 The core nodes are defined in the base class [RosNode](rosnode.py). RosNode was intended to be derived in the event the user wishes to see specific behavior. An example of a derived node class can be found in the [example_nodeclass](example_nodeclass.py) file. If a user has multiple subscribers you can use a switch statement to interpret the message. 
@@ -45,3 +45,7 @@ For more advanced usage you coud derive multiple classes from RosNode to handle 
 
 ## Looking Forward
 This still has quite a bit of work to be done before it's ready.
+
+
+## Why this exists
+I was tasked with coding a robot to navigate a course while utilizing ROS2. Unhappy with the examples and messy structure I created this wrapper.
