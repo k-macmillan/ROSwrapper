@@ -39,7 +39,12 @@ nc.run
 You can spin up a publisher in 3 lines of code using ROSwrapper. Additional publishers/subscribers are 1 line of code each. Nodes are added to the [NodeControl](nodecontrol.py) so everything can be cleanly executed and cleaned up.
 
 ## A RosNode
-The core nodes are defined in the base class [RosNode](rosnode.py). RosNode was intended to be derived in the event the user wishes to see specific behavior. An example of a derived node class can be found in the [example_nodeclass](example_nodeclass.py) file. If a user has multiple subscribers you can use a switch statement to interpret the message. 
+The core nodes are defined in the base class [RosNode](rosnode.py). RosNode was intended to be derived in the event the user wishes to see specific behavior.
+
+- An example of it running with the base node type can be found in [example_basenode](example_basenode.py). 
+- An example of a derived node class can be found in the [example_derivednode](example_derivednode.py) file. 
+
+If a user has multiple subscribers you can use a switch statement to interpret the message. 
 
 For more advanced usage you coud derive multiple classes from RosNode to handle each case. For example a robot may have IR sensors and wheels, each of which could have a custom class to deal with the information.
 
