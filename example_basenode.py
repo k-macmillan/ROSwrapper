@@ -18,5 +18,6 @@ if __name__ == '__main__':
                        pub_chan='topicasdf',
                        pub_data_type=String,
                        pub_data='Hello World',
-                       pub_rate=2))
+                       pub_rate=2,
+                       asdf='asdf'))
     nc.run()

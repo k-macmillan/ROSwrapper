@@ -5,31 +5,38 @@ from rclpy import create_node           # ROS2 for python
 
 class RosNode(object):
     """ Simplifies creating ROS nodes """
-    def __init__(self,
-                 name='node',
-                 sub_data_type=None,
-                 sub_chan='sub_chan',
-                 pub_data_type=None,
-                 pub_chan='pub_chan',
-                 pub_rate=0.0,
-                 pub_data=None,):
-        self.node = create_node(name)
-        self.pub_data = pub_data
-        self.pub_data_last = pub_data
-        self.sub_data_type = sub_data_type
-        self.pub_data_type = pub_data_type
+
+    name = 'node'
+    sub_data_type = None
+    sub_chan = 'sub_chan'
+    pub_data_type = None
+    pub_chan = 'pub_chan'
+    pub_rate = 0.0
+    pub_data = None
+
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+            try:
+                RosNode.__dict__[key]
+            except KeyError:
+                print('\n\nWARNING:\
+                      \nInvalid keyword argument in node constructor: {}\n\n'
+                      .format(key))
+
+        self.node = create_node(self.name)
         self.timer = None
 
-        if sub_data_type is not None:
+        if self.sub_data_type is not None:
             self.subscriber = self.node.\
-                create_subscription(sub_data_type,
-                                    sub_chan,
+                create_subscription(self.sub_data_type,
+                                    self.sub_chan,
                                     self.__subscribe)
 
-        if pub_data_type is not None:
-            self.pub_msg = pub_data_type()
+        if self.pub_data_type is not None:
+            self.pub_msg = self.pub_data_type()
             try:
-                self.timer_period = 1.0 / pub_rate
+                self.timer_period = 1.0 / self.pub_rate
                 try:
                     self.timer = self.node.\
                         create_timer(self.timer_period, self.__publish)
@@ -47,8 +54,8 @@ class RosNode(object):
                 #       format(self.node.get_name()))
                 # exit()
 
-            self.publisher = self.node.create_publisher(pub_data_type,
-                                                        pub_chan)
+            self.publisher = self.node.create_publisher(self.pub_data_type,
+                                                        self.pub_chan)
         print('Created node: ', self.node.get_name())
 
     def __subscribe(self, msg):

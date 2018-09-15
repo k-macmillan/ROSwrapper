@@ -8,21 +8,8 @@ class NodeClass(RosNode):
     """ This is an example of what a class would look like if you wanted to
         override RosNode so you can have custom publish/subscribe functions.
     """
-    def __init__(self,
-                 name='node',
-                 sub_data_type=None,
-                 sub_chan='sub_chan',
-                 pub_data_type=None,
-                 pub_chan='pub_chan',
-                 pub_rate=0.0,
-                 pub_data=None,):
-        super(NodeClass, self).__init__(name,
-                                        sub_data_type,
-                                        sub_chan,
-                                        pub_data_type,
-                                        pub_chan,
-                                        pub_rate,
-                                        pub_data)
+    def __init__(self, **kwargs):
+        super(NodeClass, self).__init__(**kwargs)
 
     def publish(self):
         """ Example overriden publish method """
