@@ -6,20 +6,30 @@ from rclpy import create_node           # ROS2 for python
 class RosNode(object):
     """ Simplifies creating ROS nodes """
 
-    name = 'node'
-    sub_data_type = None
-    sub_chan = 'sub_chan'
-    pub_data_type = None
-    pub_chan = 'pub_chan'
-    pub_rate = 0.0
-    pub_data = None
+    # instance variables declared as class variable set for performance
+    attribs = {'name',
+               'sub_data_type',
+               'sub_chan',
+               'pub_data_type',
+               'pub_chan',
+               'pub_rate',
+               'pub_data', }
 
     def __init__(self, **kwargs):
+        """ Initializes the class """
+        # keyword arguments
+        self.name = 'node'
+        self.sub_data_type = None
+        self.sub_chan = 'sub_chan'
+        self.pub_data_type = None
+        self.pub_chan = 'pub_chan'
+        self.pub_rate = 0.0
+        self.pub_data = None
+
         for key, value in kwargs.items():
-            setattr(self, key, value)
-            try:
-                RosNode.__dict__[key]
-            except KeyError:
+            if key in self.attribs:
+                setattr(self, key, value)
+            else:
                 print('\n\nWARNING:\
                       \nInvalid keyword argument in node constructor: {}\n\n'
                       .format(key))
