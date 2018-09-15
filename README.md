@@ -34,7 +34,7 @@ nc.addnode(RosNode(name='publisher',
                    pub_chan='topic',
                    pub_rate=2,  # in Hz
                    pub_data='Hello World'))
-nc.run
+nc.run()
 ```
 You can spin up a publisher in 3 lines of code using ROSwrapper. Additional publishers/subscribers are 1 line of code each. Nodes are added to the [NodeControl](nodecontrol.py) so everything can be cleanly executed and cleaned up.
 
