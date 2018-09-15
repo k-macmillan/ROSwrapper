@@ -1,5 +1,5 @@
 # ROSwrapper
-ROSwrapper is a wrapper for ROS2's rclpy. ROSwrapper uses object oriented programming to turn nodes into clean, self-contained objects that can be added or removed from system.
+ROSwrapper is a wrapper for [ROS2's rclpy](https://github.com/ros2/rclpy). ROSwrapper uses object oriented programming to turn nodes into clean, self-contained objects that can be added or removed from the NodeControl class. Nodes are spun and stopped through use of a controller, as defined in the [NodeControl class](nodecontrol.py).
 
 ## rclpy
 To create a publish node with a timer in rclpy:
