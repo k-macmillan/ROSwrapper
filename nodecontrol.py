@@ -1,8 +1,6 @@
 from time import sleep                              # Cleanup safety
 import rclpy                                        # ROS for python
-from std_msgs.msg import String                     # For sample
 from rclpy.executors import SingleThreadedExecutor  # To spins all nodes
-from rosnode import RosNode                         # Base node class
 
 
 class NodeControl():
@@ -59,21 +57,3 @@ class NodeControl():
             print('Already cleaned up')
         except AttributeError:
             pass  # rclpy is poorly written?
-
-
-if __name__ == '__main__':
-    # Sample usage
-
-    nc = NodeControl()
-    # nc.addnode(RosNode(name='b', sub_chan='test', sub_data_type=String))
-    # nc.addnode(RosNode(name='a', pub_chan='test', pub_data_type=String,
-    #                    pub_rate=2, pub_data='asdf'))
-    # nc.addnode(RosNode(name='c'))
-    # nc.removenode('c')
-    # nc.printnodes()
-    nc.addnode(RosNode(name='publisher',
-                       pub_chan='topicasdf',
-                       pub_data_type=String,
-                       pub_data='Hello World',
-                       pub_rate=2))
-    nc.run()

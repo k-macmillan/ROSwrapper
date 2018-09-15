@@ -1,5 +1,3 @@
-#! /usr/bin/env python3.5
-
 from collections import Iterable        # Determine if data is iterable
 from std_msgs.msg import *              # Import all message types
 from rclpy import create_node           # Only need to create a node
