@@ -1,5 +1,5 @@
 from time import sleep                              # Cleanup safety
-import rclpy                                        # ROS for python
+import rclpy                                        # ROS2 for python
 from rclpy.executors import SingleThreadedExecutor  # To spins all nodes
 
 
