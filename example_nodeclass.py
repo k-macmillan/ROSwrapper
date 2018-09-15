@@ -5,7 +5,7 @@ from collections import Iterable
 from std_msgs.msg import *
 
 
-class MyPub(RosNode):
+class NodeClass(RosNode):
     """ This is an example of what a class would look like if you wanted to
         override RosNode so you can have custom publish/subscribe functions.
     """
@@ -17,13 +17,13 @@ class MyPub(RosNode):
                  pub_chan='pub_chan',
                  pub_rate=0.0,
                  pub_data=None,):
-        super(MyPub, self).__init__(name,
-                                    sub_data_type,
-                                    sub_chan,
-                                    pub_data_type,
-                                    pub_chan,
-                                    pub_rate,
-                                    pub_data)
+        super(NodeClass, self).__init__(name,
+                                        sub_data_type,
+                                        sub_chan,
+                                        pub_data_type,
+                                        pub_chan,
+                                        pub_rate,
+                                        pub_data)
 
     def publish(self):
         """ Example overriden publish method """
