@@ -110,9 +110,10 @@ class RosNode(object):
         """ Destroys the node and lets the user know it was destroyed. """
         name = self.node.get_name()
         try:
-            self.node.destroy_timer(self.timer)
+            if self.timer is not None:
+                self.node.destroy_timer(self.timer)
+                print('Timer destroyed for: ', name)
             self.node.destroy_node()
-            print('Timer destroyed for: ', name)
             print('Destroyed node: ', name)
         except BaseException as e:
             print('Failed to destroy node due to a\
