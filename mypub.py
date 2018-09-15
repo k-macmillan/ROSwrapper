@@ -13,19 +13,15 @@ class MyPub(RosNode):
                  name='node',
                  sub_data_type=None,
                  sub_chan='sub_chan',
-                 sub_func=None,
                  pub_data_type=None,
                  pub_chan='pub_chan',
-                 pub_func=None,
                  pub_rate=0.0,
                  pub_data=None,):
         super(MyPub, self).__init__(name,
                                     sub_data_type,
                                     sub_chan,
-                                    sub_func,
                                     pub_data_type,
                                     pub_chan,
-                                    pub_func,
                                     pub_rate,
                                     pub_data)
 

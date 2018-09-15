@@ -11,10 +11,8 @@ class RosNode(object):
                  name='node',
                  sub_data_type=None,
                  sub_chan='sub_chan',
-                 sub_func=None,
                  pub_data_type=None,
                  pub_chan='pub_chan',
-                 pub_func=None,
                  pub_rate=0.0,
                  pub_data=None,):
         self.node = create_node(name)
@@ -22,31 +20,21 @@ class RosNode(object):
         self.pub_data_last = pub_data
         self.sub_data_type = sub_data_type
         self.pub_data_type = pub_data_type
+        self.timer = None
 
         if sub_data_type is not None:
             self.subscriber = self.node.\
                 create_subscription(sub_data_type,
                                     sub_chan,
-                                    self.__subscribe
-                                    if sub_func is None
-                                    else sub_func)
+                                    self.__subscribe)
 
         if pub_data_type is not None:
             self.pub_msg = pub_data_type()
             try:
                 self.timer_period = 1.0 / pub_rate
                 try:
-                    if (not isinstance(self.pub_data,
-                                       Iterable))\
-                            or pub_data_type is String:
-                        self.pub_msg.data = self.pub_data
-                        self.timer = self.node.\
-                            create_timer(self.timer_period,
-                                         self.__publish)
-                    else:
-                        self.timer = self.node.\
-                            create_timer(self.timer_period,
-                                         self.__publish)
+                    self.timer = self.node.\
+                        create_timer(self.timer_period, self.__publish)
                 except TypeError:
                     print('Type error!')
                     pass
@@ -55,10 +43,11 @@ class RosNode(object):
                       format(self.node.get_name()))
                 exit()
             except ZeroDivisionError:
-                print('Node: \"{}\" cannot publish at a rate '
-                      'of 0.0 times per second\n'.
-                      format(self.node.get_name()))
-                exit()
+                pass
+                # print('Node: \"{}\" cannot publish at a rate '
+                #       'of 0.0 times per second\n'.
+                #       format(self.node.get_name()))
+                # exit()
 
             self.publisher = self.node.create_publisher(pub_data_type,
                                                         pub_chan)
@@ -123,7 +112,9 @@ class RosNode(object):
         """ Destroys the node and lets the user know it was destroyed. """
         name = self.node.get_name()
         try:
+            self.node.destroy_timer(self.timer)
             self.node.destroy_node()
+            print('Timer destroyed for: ', name)
             print('Destroyed node: ', name)
         except BaseException as e:
             print('Failed to destroy node due to a\

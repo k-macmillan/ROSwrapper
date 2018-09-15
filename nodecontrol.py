@@ -2,6 +2,7 @@ from time import sleep                              # Cleanup safety
 import rclpy                                        # ROS for python
 from std_msgs.msg import String                     # For sample
 from rclpy.executors import SingleThreadedExecutor  # To spins all nodes
+from rosnode import RosNode                         # Base node class
 
 
 class NodeControl():
@@ -47,7 +48,7 @@ class NodeControl():
         """ Cleans up the ROS nodes and properly shuts down rclpy. """
         try:
             self.executor.shutdown()
-            print()
+            print('\nCleaning up...\n')
             for node in self.nodes:
                 node.cleanup()
             # Added 1s delay to let nodes close
@@ -63,11 +64,16 @@ class NodeControl():
 if __name__ == '__main__':
     # Sample usage
 
-    n = NodeControl()
-    n.addnode(name='b', sub_chan='test', sub_data_type=String)
-    n.addnode(name='a', pub_chan='test', pub_data_type=String,
-              pub_rate=.5, pub_data='asdf')
-    n.addnode(name='c')
-    n.removenode('c')
-    n.printnodes()
-    n.run()
+    nc = NodeControl()
+    # nc.addnode(RosNode(name='b', sub_chan='test', sub_data_type=String))
+    # nc.addnode(RosNode(name='a', pub_chan='test', pub_data_type=String,
+    #                    pub_rate=2, pub_data='asdf'))
+    # nc.addnode(RosNode(name='c'))
+    # nc.removenode('c')
+    # nc.printnodes()
+    nc.addnode(RosNode(name='publisher',
+                       pub_chan='topicasdf',
+                       pub_data_type=String,
+                       pub_data='Hello World',
+                       pub_rate=2))
+    nc.run()
