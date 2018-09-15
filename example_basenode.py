@@ -19,5 +19,5 @@ if __name__ == '__main__':
                        pub_data_type=String,
                        pub_data='Hello World',
                        pub_rate=2,
-                       asdf='asdf'))
+                       asdf='asdf'))    # asdf is a sample false keyword
     nc.run()
