@@ -18,6 +18,8 @@ class NodeControl():
         self.nodes.append(node)
         self.executor.add_node(self.nodes[-1].node)
 
+        return self.nodes[-1]
+
     def removenode(self, name):
         """ Removes all nodes with a given name from the nodes list.
             Will remove all nodes of this name!

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     nc.addnode(NodeClass(name='a',
                          pub_data_type=String,
                          pub_chan='/testInheritance',
-                         pub_rate=2,
+                         pub_rate=5,
                          pub_data='test'))
 
     nc.addnode(NodeClass(name='b',

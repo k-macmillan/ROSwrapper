@@ -46,27 +46,25 @@ class RosNode(object):
         if self.pub_data_type is not None:
             self.pub_msg = self.pub_data_type()
             try:
-                self.timer_period = 1.0 / self.pub_rate
-                try:
-                    self.timer = self.node.\
-                        create_timer(self.timer_period, self.__publish)
-                except TypeError:
-                    print('Type error!')
-                    pass
+                if self.pub_rate != 0.0:
+                    self.__maketimer()
             except AssertionError:
                 print('Node: \"{}\" requires data to publish\n'.
                       format(self.node.get_name()))
                 exit()
-            except ZeroDivisionError:
-                pass
-                # print('Node: \"{}\" cannot publish at a rate '
-                #       'of 0.0 times per second\n'.
-                #       format(self.node.get_name()))
-                # exit()
 
             self.publisher = self.node.create_publisher(self.pub_data_type,
                                                         self.pub_chan)
         print('Created node: ', self.node.get_name())
+
+    def __maketimer(self):
+        """ Generate a timer based on the pub_rate """
+        timer_period = 1.0 / self.pub_rate
+        try:
+            self.timer = self.node.create_timer(timer_period, self.__publish)
+        except TypeError:
+            print('TypeError when setting timer!')
+            pass
 
     def __subscribe(self, msg):
         """ Callback for subscriptions. Has to be done this way because ROS
@@ -79,6 +77,8 @@ class RosNode(object):
             # Lets just catch them all and display the issue.
             print('Failed to subscribe due to a(n) {}!'
                   .format(type(e).__name__))
+        if self.pub_data_type is not None:
+            self.__sub_pub(msg)
 
     def subscribe(self, msg):
         """ Posts msg to get_logger().info """
@@ -91,9 +91,18 @@ class RosNode(object):
         """
         self.sub_pub()
 
-    def sub_pub():
-        """ Handles nodes that both publish and subscribe. """
-        print('TODO')
+    def sub_pub(self, msg):
+        """ When a subscription is heard it is published to the publish channel
+            if the pub_rate is 0.0. If the pub_rate is not 0.0 then it updates
+            the message for the next time the publish timer goes off. Messages
+            must be of the same type to pull off the latter type.
+        """
+        if self.timer is None:
+            self.publisher.publish(msg)
+        elif type(self.pub_data_type) == type(msg):
+            self.pub_msg = msg
+        else:
+            print('Message types incompatible')
 
     def __publish(self):
         """ Callback for timed publishes. Has to be done this way because ROS
