@@ -8,6 +8,7 @@ class RosNode(object):
 
     # instance variables declared as class variable set for performance
     attribs = {'name',
+               'obj',
                'sub_data_type',
                'sub_chan',
                'pub_data_type',
@@ -19,6 +20,7 @@ class RosNode(object):
         """ Initializes the class """
         # keyword arguments
         self.name = 'node'
+        self.obj = None
         self.sub_data_type = None
         self.sub_chan = 'sub_chan'
         self.pub_data_type = None
@@ -89,7 +91,7 @@ class RosNode(object):
             will not call the overriden inherited method so we call a base
             class method which then calls a possibly overriden method.
         """
-        self.sub_pub()
+        self.sub_pub(msg)
 
     def sub_pub(self, msg):
         """ When a subscription is heard it is published to the publish channel
