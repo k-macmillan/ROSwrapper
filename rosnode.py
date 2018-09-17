@@ -1,5 +1,5 @@
 from collections.abc import Sequence    # Determine if data is iterable
-# from std_msgs.msg import *              # Import all message types
+from types import GeneratorType
 from rclpy import create_node           # ROS2 for python
 from collections import Iterable
 import std_msgs as msg
@@ -159,7 +159,7 @@ class RosNode(object):
         elif type(self.pub_data_type) == type(msg):
             self.pub_msg = msg
         else:
-            print('Message types incompatible')
+            print('Node: {} received an incompatible message type'.format(self.name))
 
     def __publish(self):
         """ Callback for timed publishes. Has to be done this way because ROS
@@ -170,23 +170,30 @@ class RosNode(object):
             self.publish()
         except BaseException as e:
             # Lets just catch them all and display the issue.
-            print('Failed to publish due to a\
-                  {} exception!'.format(type(e).__name__))
+            print('Node: {} failed to publish due to a(n) {}'.format(self.name, type(e).__name__))
 
     def publish(self):
         """ Publishes what is currently in pub_msg.data. If pub_msg.data is
             iteritable it will instead call next on it.
         """
-        if (not isinstance(self.pub_data, Iterable))\
-                or self.pub_data_type is msg.String:
-                    self.publisher.publish(self.pub_msg)
-        else:
+        isIter = False
+        try:
+            if self.pub_data.__class__ is zip().__class__:
+                isIter = True
+            if self.__seq_but_not_str(self.pub_data):
+                isIter = True
+        except:
+            pass
+
+        if isIter:
             # Have to test for StopIteration unfortunately
             try:
                 self.pub_data_last = next(self.pub_data)
             except StopIteration:
                 pass
             self.pub_msg.data = self.pub_data_last
+            self.publisher.publish(self.pub_msg)
+        else:
             self.publisher.publish(self.pub_msg)
 
     def cleanup(self):

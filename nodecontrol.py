@@ -6,7 +6,10 @@ from rclpy.executors import SingleThreadedExecutor  # To spins all nodes
 class NodeControl():
     """ Primary controller for RosNodes and derivatives of RosNode. """
     def __init__(self):
-        rclpy.init()
+        try:
+            rclpy.init()
+        except RuntimeError:
+            pass
         self.nodes = []
         self.executor = SingleThreadedExecutor()
 
