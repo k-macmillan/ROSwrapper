@@ -138,8 +138,8 @@ class RosNode(object):
             self.__sub_pub(msg)
 
     def subscribe(self, msg):
-        """ Posts msg to get_logger().info """
-        self.node.get_logger().info('"%s"' % msg.data)
+        """ Prints message """
+        print(msg.data)
 
     def __sub_pub(self, msg):
         """ Callback for subs that pub. Has to be done this way because ROS
