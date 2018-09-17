@@ -53,4 +53,4 @@ This still has quite a bit of work to be done before it's ready.
 
 
 ## Why this exists
-I was tasked with coding a robot to navigate a course while utilizing ROS2. Unhappy with the examples and messy structure I created this wrapper.
+I was tasked with coding a robot to navigate a course while utilizing ROS2. I prefer object-oriented programming with working with something such as nodes so I built this to wrap rclpy into a more user-friendly product.
