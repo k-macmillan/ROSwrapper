@@ -12,9 +12,15 @@ class NodeControl():
 
     def addnode(self, node):
         """ Adds a node to the nodes list to be ran by the executor. """
+
+        if node.valid is False:
+            print('Node created incorrectly, did not add a node')
+            return None
+
         if not self.executor._guard_condition:
             print('\nCannot add nodes while running!\n')
             exit()
+
         self.nodes.append(node)
         self.executor.add_node(self.nodes[-1].node)
 
@@ -37,6 +43,10 @@ class NodeControl():
 
     def run(self):
         """ Fires up the executor and handles keyboard interrupts. """
+        if len(self.nodes) == 0:
+            print('No nodes to run')
+            self.__cleanup()
+
         print('Running...\n')
         try:
             self.executor.spin()
@@ -58,4 +68,4 @@ class NodeControl():
         except RuntimeError:
             print('Already cleaned up')
         except AttributeError:
-            pass  # rclpy is poorly written?
+            pass  # rclpy issue?

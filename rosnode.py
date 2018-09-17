@@ -1,6 +1,8 @@
-from collections import Iterable        # Determine if data is iterable
-from std_msgs.msg import *              # Import all message types
+from collections.abc import Sequence    # Determine if data is iterable
+# from std_msgs.msg import *              # Import all message types
 from rclpy import create_node           # ROS2 for python
+from collections import Iterable
+import std_msgs as msg
 
 
 class RosNode(object):
@@ -16,6 +18,18 @@ class RosNode(object):
                'pub_rate',
                'pub_data', }
 
+    @staticmethod
+    def __is_msg_data_type(obj):
+        for arg in dir(msg):
+            if type(obj) is type(arg):
+                return True
+        return False
+
+    @staticmethod
+    def __seq_but_not_str(obj):
+        return isinstance(obj, Sequence) and\
+            not isinstance(obj, (str, bytes, bytearray))
+
     def __init__(self, **kwargs):
         """ Initializes the class """
         # keyword arguments
@@ -27,6 +41,7 @@ class RosNode(object):
         self.pub_chan = 'pub_chan'
         self.pub_rate = 0.0
         self.pub_data = None
+        self.valid = True       # Used to identify invalid state
 
         for key, value in kwargs.items():
             if key in self.attribs:
@@ -38,12 +53,13 @@ class RosNode(object):
 
         self.node = create_node(self.name)
         self.timer = None
-
         if self.sub_data_type is not None:
-            self.subscriber = self.node.\
-                create_subscription(self.sub_data_type,
-                                    self.sub_chan,
-                                    self.__subscribe)
+            try:
+                self.__createsubs()
+            except BaseException:
+                self.cleanup()
+                self.valid = False
+                return
 
         if self.pub_data_type is not None:
             self.pub_msg = self.pub_data_type()
@@ -58,6 +74,45 @@ class RosNode(object):
             self.publisher = self.node.create_publisher(self.pub_data_type,
                                                         self.pub_chan)
         print('Created node: ', self.node.get_name())
+
+    def __createsubs(self):
+        chan_len = 1
+        type_len = 1
+
+        # Check if sub_chan is a sequence
+        if self.__seq_but_not_str(self.sub_chan):
+            chan_len = len(self.sub_chan)
+        # Now check if sub data types are equal to the number of channels
+        if self.__seq_but_not_str(self.sub_data_type):
+            type_len = len(self.sub_data_type)
+            for d_type in self.sub_data_type:
+                if self.__is_msg_data_type(d_type):
+                    print('Unsuported message type: ', d_type)
+                    raise
+
+        if chan_len == type_len and chan_len == 1:
+            # Handle single case, make a tuple
+            self.subscriber = (self.node
+                               .create_subscription(self.sub_data_type,
+                                                    self.sub_chan,
+                                                    self.__subscribe), )
+        elif type_len == 1:
+            # Multiple channels, single type
+            for i in range(len(self.sub_chan)):
+                self.subscriber = (self.node
+                                   .create_subscription(self.sub_data_type,
+                                                        self.sub_chan[i],
+                                                        self.__subscribe))
+        elif chan_len == type_len:
+            # Multiple channels, multiple types
+            for i in range(len(self.sub_data_type)):
+                self.subscriber = (self.node
+                                   .create_subscription(self.sub_data_type[i],
+                                                        self.sub_chan[i],
+                                                        self.__subscribe))
+        else:
+            print('sub_data_type count must equal sub_chan or be 1')
+            raise
 
     def __maketimer(self):
         """ Generate a timer based on the pub_rate """
@@ -123,7 +178,7 @@ class RosNode(object):
             iteritable it will instead call next on it.
         """
         if (not isinstance(self.pub_data, Iterable))\
-                or self.pub_data_type is String:
+                or self.pub_data_type is msg.String:
                     self.publisher.publish(self.pub_msg)
         else:
             # Have to test for StopIteration unfortunately
