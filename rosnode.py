@@ -27,8 +27,9 @@ class RosNode(object):
 
     @staticmethod
     def __seq_but_not_str(obj):
-        return isinstance(obj, Sequence) and\
-            not isinstance(obj, (str, bytes, bytearray))
+        """ Checks for a sequence object but not a string, returns true if seq but not str """
+        return (isinstance(obj, Sequence) and not isinstance(obj, (str, bytes, bytearray))) or\
+            isinstance(obj, zip)
 
     def __init__(self, **kwargs):
         """ Initializes the class """
@@ -72,7 +73,9 @@ class RosNode(object):
                 print('Node: \"{}\" requires data to publish\n'.
                       format(self.node.get_name()))
                 exit()
-            self.pub_msg.data = self.pub_data
+            if not self.__seq_but_not_str(self.pub_data):
+                print('totally not a sequence')
+                self.pub_msg.data = self.pub_data
             self.publisher = self.node.create_publisher(self.pub_data_type,
                                                         self.pub_chan)
         print('Created node: ', self.node.get_name())
