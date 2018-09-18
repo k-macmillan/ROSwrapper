@@ -53,6 +53,7 @@ class RosNode(object):
 
         self.node = create_node(self.name)
         self.timer = None
+
         if self.sub_data_type is not None:
             try:
                 self.__createsubs()
@@ -90,26 +91,31 @@ class RosNode(object):
                     print('Unsuported message type: ', d_type)
                     raise
 
+        if self.pub_data is None:
+            sub_func = self.__subscribe
+        else:
+            sub_func = self.__sub_pub
+
         if chan_len == type_len and chan_len == 1:
             # Handle single case, make a tuple
             self.subscriber = (self.node
                                .create_subscription(self.sub_data_type,
                                                     self.sub_chan,
-                                                    self.__subscribe), )
+                                                    sub_func), )
         elif type_len == 1:
             # Multiple channels, single type
             for i in range(len(self.sub_chan)):
                 self.subscriber = (self.node
                                    .create_subscription(self.sub_data_type,
                                                         self.sub_chan[i],
-                                                        self.__subscribe))
+                                                        self.__subscribe, (self.sub_chan[i],)))
         elif chan_len == type_len:
             # Multiple channels, multiple types
             for i in range(len(self.sub_data_type)):
                 self.subscriber = (self.node
                                    .create_subscription(self.sub_data_type[i],
                                                         self.sub_chan[i],
-                                                        self.__subscribe))
+                                                        sub_func))
         else:
             print('sub_data_type count must equal sub_chan or be 1')
             raise
@@ -192,9 +198,8 @@ class RosNode(object):
             except StopIteration:
                 pass
             self.pub_msg.data = self.pub_data_last
-            self.publisher.publish(self.pub_msg)
-        else:
-            self.publisher.publish(self.pub_msg)
+        
+        self.publisher.publish(self.pub_msg)
 
     def cleanup(self):
         """ Destroys the node and lets the user know it was destroyed. """
