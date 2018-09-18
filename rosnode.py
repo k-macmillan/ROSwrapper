@@ -1,7 +1,6 @@
 from collections.abc import Sequence    # Determine if data is iterable
 from rclpy import create_node           # ROS2 for python
-# from collections import Iterable
-import std_msgs as msg
+import std_msgs as msg                  # ROS2 message types
 from functools import partial           # To bind functions
 
 
@@ -100,6 +99,9 @@ class RosNode(object):
 
         self.subscriber = []
 
+        # Messy logic to allow better user functionality. This allows users to pass
+        # RosNode a list of sub_data_type and/or sub_chan and create subscriptions for each.
+        # There may be a cleaner way to write this but this is functional and correct.
         if chan_len == type_len and chan_len == 1:
             # Handle single case, make a tuple
             self.subscriber.append(self.node.create_subscription(self.sub_data_type,
@@ -122,13 +124,12 @@ class RosNode(object):
             raise
 
     def __maketimer(self):
-        """ Generate a timer based on the pub_rate """
+        """ Generate a timer based on the pub_rate in Hz"""
         timer_period = 1.0 / self.pub_rate
         try:
             self.timer = self.node.create_timer(timer_period, self.__publish)
         except TypeError:
             print('TypeError when setting timer!')
-            pass
 
     def __subscribe(self, topic, msg):
         """ Callback for subscriptions. Has to be done this way because ROS
@@ -217,9 +218,3 @@ class RosNode(object):
         except BaseException as e:
             print('Failed to destroy node due to a\
                   {} exception!'.format(type(e).__name__))
-
-
-class testmsg(msg.__class__):
-    def __init__(self, topic):
-        super().__init(self)
-        self.topic = topic
