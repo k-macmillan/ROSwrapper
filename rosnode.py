@@ -16,7 +16,8 @@ class RosNode(object):
                'pub_data_type',
                'pub_chan',
                'pub_rate',
-               'pub_data', }
+               'pub_data',
+               'print_to_console', }
 
     @staticmethod
     def __is_msg_data_type(obj):
@@ -41,6 +42,7 @@ class RosNode(object):
         self.pub_chan = 'pub_chan'
         self.pub_rate = 0.0
         self.pub_data = None
+        self.print_to_console = True
         self.valid = True       # Used to identify invalid state
 
         for key, value in kwargs.items():
@@ -142,7 +144,8 @@ class RosNode(object):
 
     def subscribe(self, topic, msg):
         """ Prints message """
-        print('Received: {} on topic: {}'.format(msg.data, topic))
+        if self.print_to_console:
+            print('Received: {} on topic: {}'.format(msg.data, topic))
 
     def __sub_pub(self, topic, msg):
         """ Callback for subs that pub. Has to be done this way because ROS
@@ -199,6 +202,8 @@ class RosNode(object):
             self.pub_msg.data = self.pub_data_last
 
         self.publisher.publish(self.pub_msg)
+        if self.print_to_console:
+            print('Published: {}'.format(self.pub_msg.data))
 
     def cleanup(self):
         """ Destroys the node and lets the user know it was destroyed. """
