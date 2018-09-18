@@ -72,7 +72,7 @@ class RosNode(object):
                 print('Node: \"{}\" requires data to publish\n'.
                       format(self.node.get_name()))
                 exit()
-
+            self.pub_msg.data = self.pub_data
             self.publisher = self.node.create_publisher(self.pub_data_type,
                                                         self.pub_chan)
         print('Created node: ', self.node.get_name())
