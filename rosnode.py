@@ -123,6 +123,10 @@ class RosNode(object):
             print('sub_data_type count must equal sub_chan or be 1')
             raise
 
+    def __createpubs(self):
+        # TODO create multiple publishers on a single node
+        pass
+
     def __maketimer(self):
         """ Generate a timer based on the pub_rate in Hz"""
         timer_period = 1.0 / self.pub_rate
