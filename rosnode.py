@@ -1,8 +1,8 @@
 from collections.abc import Sequence    # Determine if data is iterable
-from types import GeneratorType
 from rclpy import create_node           # ROS2 for python
-from collections import Iterable
+# from collections import Iterable
 import std_msgs as msg
+from functools import partial           # To bind functions
 
 
 class RosNode(object):
@@ -96,26 +96,25 @@ class RosNode(object):
         else:
             sub_func = self.__sub_pub
 
+        self.subscriber = []
+
         if chan_len == type_len and chan_len == 1:
             # Handle single case, make a tuple
-            self.subscriber = (self.node
-                               .create_subscription(self.sub_data_type,
-                                                    self.sub_chan,
-                                                    sub_func), )
+            self.subscriber.append(self.node.create_subscription(self.sub_data_type,
+                                                                 self.sub_chan,
+                                                                 partial(sub_func, self.sub_chan)), )
         elif type_len == 1:
             # Multiple channels, single type
             for i in range(len(self.sub_chan)):
-                self.subscriber = (self.node
-                                   .create_subscription(self.sub_data_type,
-                                                        self.sub_chan[i],
-                                                        self.__subscribe, (self.sub_chan[i],)))
+                self.subscriber.append(self.node.create_subscription(self.sub_data_type,
+                                                                     self.sub_chan[i],
+                                                                     partial(sub_func, self.sub_chan[i])))
         elif chan_len == type_len:
             # Multiple channels, multiple types
             for i in range(len(self.sub_data_type)):
-                self.subscriber = (self.node
-                                   .create_subscription(self.sub_data_type[i],
-                                                        self.sub_chan[i],
-                                                        sub_func))
+                self.subscriber.append(self.node.create_subscription(self.sub_data_type[i],
+                                                                     self.sub_chan[i],
+                                                                     partial(sub_func, self.sub_chan[i])))
         else:
             print('sub_data_type count must equal sub_chan or be 1')
             raise
@@ -129,32 +128,30 @@ class RosNode(object):
             print('TypeError when setting timer!')
             pass
 
-    def __subscribe(self, msg):
+    def __subscribe(self, topic, msg):
         """ Callback for subscriptions. Has to be done this way because ROS
             will not call the overriden inherited method so we call a base
             class method which then calls a possibly overriden method.
         """
         try:
-            self.subscribe(msg)
+            self.subscribe(topic=topic, msg=msg)
         except BaseException as e:
             # Lets just catch them all and display the issue.
-            print('Failed to subscribe due to a(n) {}!'
-                  .format(type(e).__name__))
-        if self.pub_data_type is not None:
-            self.__sub_pub(msg)
+            print('{} failed to subscribe due to a(n) {}!'
+                  .format(self.name, type(e).__name__))
 
-    def subscribe(self, msg):
+    def subscribe(self, topic, msg):
         """ Prints message """
-        print(msg.data)
+        print('Received: {} on topic: {}'.format(msg.data, topic))
 
-    def __sub_pub(self, msg):
+    def __sub_pub(self, topic, msg):
         """ Callback for subs that pub. Has to be done this way because ROS
             will not call the overriden inherited method so we call a base
             class method which then calls a possibly overriden method.
         """
-        self.sub_pub(msg)
+        self.sub_pub(topic=topic, msg=msg)
 
-    def sub_pub(self, msg):
+    def sub_pub(self, topic, msg):
         """ When a subscription is heard it is published to the publish channel
             if the pub_rate is 0.0. If the pub_rate is not 0.0 then it updates
             the message for the next time the publish timer goes off. Messages
@@ -165,7 +162,8 @@ class RosNode(object):
         elif type(self.pub_data_type) == type(msg):
             self.pub_msg = msg
         else:
-            print('Node: {} received an incompatible message type'.format(self.name))
+            print('Node: {} received an incompatible message type'
+                  .format(self.name))
 
     def __publish(self):
         """ Callback for timed publishes. Has to be done this way because ROS
@@ -176,7 +174,8 @@ class RosNode(object):
             self.publish()
         except BaseException as e:
             # Lets just catch them all and display the issue.
-            print('Node: {} failed to publish due to a(n) {}'.format(self.name, type(e).__name__))
+            print('Node: {} failed to publish due to a(n) {}'
+                  .format(self.name, type(e).__name__))
 
     def publish(self):
         """ Publishes what is currently in pub_msg.data. If pub_msg.data is
@@ -188,7 +187,7 @@ class RosNode(object):
                 isIter = True
             if self.__seq_but_not_str(self.pub_data):
                 isIter = True
-        except:
+        except BaseException:
             pass
 
         if isIter:
@@ -198,7 +197,7 @@ class RosNode(object):
             except StopIteration:
                 pass
             self.pub_msg.data = self.pub_data_last
-        
+
         self.publisher.publish(self.pub_msg)
 
     def cleanup(self):
@@ -213,3 +212,9 @@ class RosNode(object):
         except BaseException as e:
             print('Failed to destroy node due to a\
                   {} exception!'.format(type(e).__name__))
+
+
+class testmsg(msg.__class__):
+    def __init__(self, topic):
+        super().__init(self)
+        self.topic = topic
