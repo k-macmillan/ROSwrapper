@@ -74,7 +74,6 @@ class RosNode(object):
                       format(self.node.get_name()))
                 exit()
             if not self.__seq_but_not_str(self.pub_data):
-                print('totally not a sequence')
                 self.pub_msg.data = self.pub_data
             self.publisher = self.node.create_publisher(self.pub_data_type,
                                                         self.pub_chan)
@@ -144,7 +143,8 @@ class RosNode(object):
             class method which then calls a possibly overriden method.
         """
         try:
-            self.subscribe(topic=topic, msg=msg)
+            if self.subscribe(topic=topic, msg=msg) and self.print_to_console:
+                print('Received: {} on topic: {}'.format(msg.data, topic))
         except BaseException as e:
             # Lets just catch them all and display the issue.
             print('{} failed to subscribe due to a(n) {}!'
@@ -152,8 +152,7 @@ class RosNode(object):
 
     def subscribe(self, topic, msg):
         """ Prints message """
-        if self.print_to_console:
-            print('Received: {} on topic: {}'.format(msg.data, topic))
+        return True
 
     def __sub_pub(self, topic, msg):
         """ Callback for subs that pub. Has to be done this way because ROS
@@ -182,7 +181,8 @@ class RosNode(object):
             class method which then calls a possibly overriden method.
         """
         try:
-            self.publish()
+            if self.publish() and self.print_to_console:
+                print('Node: {} Published: {}'.format(self.name, self.pub_msg.data))
         except BaseException as e:
             # Lets just catch them all and display the issue.
             print('Node: {} failed to publish due to a(n) {}'
@@ -210,8 +210,7 @@ class RosNode(object):
             self.pub_msg.data = self.pub_data_last
 
         self.publisher.publish(self.pub_msg)
-        if self.print_to_console:
-            print('Published: {}'.format(self.pub_msg.data))
+        return True
 
     def cleanup(self):
         """ Destroys the node and lets the user know it was destroyed. """
