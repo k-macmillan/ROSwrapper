@@ -42,7 +42,7 @@ class RosNode(object):
         self.pub_chan = 'pub_chan'
         self.pub_rate = 0.0
         self.pub_data = None
-        self.print_to_console = True
+        self.print_to_console = False
         self.valid = True       # Used to identify invalid state
 
         for key, value in kwargs.items():

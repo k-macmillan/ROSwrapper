@@ -1,6 +1,7 @@
 from time import sleep                              # Cleanup safety
 import rclpy                                        # ROS2 for python
 from rclpy.executors import SingleThreadedExecutor  # To spins all nodes
+import threading
 
 
 class NodeControl():
@@ -60,10 +61,11 @@ class NodeControl():
     def __cleanup(self):
         """ Cleans up the ROS nodes and properly shuts down rclpy. """
         try:
-            self.executor.shutdown()
             print('\nCleaning up...\n')
+            self.executor.shutdown()
             for node in self.nodes:
                 node.cleanup()
+
             # Added 1s delay to let nodes close
             sleep(1)
             rclpy.shutdown()
