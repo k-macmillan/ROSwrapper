@@ -1,6 +1,8 @@
 from collections.abc import Sequence    # Determine if data is iterable
 from rclpy import create_node           # ROS2 for python
-import std_msgs as msg                  # ROS2 message types
+import std_msgs as std_msg                  # ROS2 message types
+import geometry_msgs.msg as geo_msg
+from inspect import getmembers, isclass
 from functools import partial           # To bind functions
 
 
@@ -20,8 +22,9 @@ class RosNode(object):
 
     @staticmethod
     def __is_msg_data_type(obj):
-        for arg in dir(msg):
-            if type(obj) is type(arg):
+        """ Pool list of message types and see if obj matches any of them """
+        for name, class_obj in getmembers(std_msg, isclass) + getmembers(geo_msg, isclass):
+            if class_obj is obj:
                 return True
         return False
 
