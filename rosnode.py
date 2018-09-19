@@ -77,7 +77,10 @@ class RosNode(object):
                       format(self.node.get_name()))
                 exit()
             if not self.__seq_but_not_str(self.pub_data):
-                self.pub_msg.data = self.pub_data
+                try:
+                    self.pub_msg.data = self.pub_data
+                except AttributeError:
+                    self.pub_msg = self.pub_data
             self.publisher = self.node.create_publisher(self.pub_data_type,
                                                         self.pub_chan)
         print('Created node: ', self.node.get_name())
